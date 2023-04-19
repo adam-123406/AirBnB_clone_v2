@@ -1,28 +1,9 @@
-#!/usr/bin/env bash
-# Bash script that sets up your web servers for the deployment of web_static
+-- Set ALL privileges on the database `hbnb_dev_db` to the `hbnb_dev` user.
+-- Set SELECT privileges on the database `performance_schema` to the `hbnb_dev` user.
 
-apt-get -y update > /dev/null
-apt-get install -y nginx > /dev/null
-
-# Create all necessary directories and file
-mkdir -p /data/web_static/releases/test/
-mkdir -p /data/web_static/shared/
-touch /data/web_static/releases/test/index.html
-echo "Hello World again!" > /data/web_static/releases/test/index.html
-
-# Check if directory current exist
-if [ -d "/data/web_static/current" ]
-then
-        sudo rm -rf /data/web_static/current
-fi
-# Create a symbolic link to test
-ln -sf /data/web_static/releases/test/ /data/web_static/current
-
-# Change ownership to user ubuntu
-chown -hR ubuntu:ubuntu /data
-
-# Configure nginx to serve content pointed to by symbolic link to hbnb_static
-sed -i '38i\\tlocation /hbnb_static/ {\n\t\talias /data/web_static/current/;\n\t}\n' /etc/nginx/sites-available/default
-
-# Restart server
-service nginx restart
+CREATE DATABASE IF NOT EXISTS hbnb_dev_db;
+DROP USER IF EXISTS 'hbnb_dev'@'localhost';
+CREATE USER 'hbnb_dev'@'localhost' IDENTIFIED BY 'hbnb_dev_pwd';
+GRANT ALL PRIVILEGES ON `hbnb_dev_db`.* TO 'hbnb_dev'@'localhost';
+GRANT SELECT ON `performance_schema`.* TO 'hbnb_dev'@'localhost';
+FLUSH PRIVILEGES;
